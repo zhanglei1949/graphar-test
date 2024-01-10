@@ -23,7 +23,7 @@ class CSVLocalFileReader(val path: String, val delimiter: String, val headerRow:
       .option("header", headerRow)
       .option("inferSchema", "false")
       .schema(schema)
-      .csv(rootLocation + "/" + path)
+      .csv(rootLocation + "/" + path).cache()
   }
 }
 

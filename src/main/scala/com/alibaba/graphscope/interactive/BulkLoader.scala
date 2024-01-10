@@ -1,5 +1,6 @@
 package com.alibaba.graphscope.interactive
 
+import com.alibaba.graphar.GeneralParams
 import com.alibaba.graphar.graph.GraphWriter
 import com.alibaba.graphscope.interactive.reader.ReaderFactory
 import org.apache.spark.sql.{DataFrame, SparkSession}
@@ -98,7 +99,7 @@ class BulkLoader(var sparkSession: SparkSession, var schema: Schema, var loading
     try {
       loadVertices(writer)
       loadEdges(writer)
-      writer.write(output_path, sparkSession, schema.name, 2, 2)
+      writer.write(output_path, sparkSession, schema.name, GeneralParams.defaultVertexChunkSize, GeneralParams.defaultEdgeChunkSize, file_type = "orc")
     }
     catch {
       case e: Exception => {
