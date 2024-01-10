@@ -1,6 +1,6 @@
 package com.alibaba.graphscope.interactive
 
-import org.apache.hadoop.fs.Path
+import org.apache.hadoop.fs.{FSDataInputStream, Path}
 import org.apache.spark.sql.SparkSession
 import org.slf4j.LoggerFactory
 import org.yaml.snakeyaml.constructor.Constructor
@@ -133,6 +133,13 @@ object Schema {
     val path = new Path(yamlPath)
     val fs = path.getFileSystem(spark.sparkContext.hadoopConfiguration)
     val input = fs.open(path)
+    val yaml = new Yaml(
+      new Constructor(classOf[Schema], new LoaderOptions())
+    )
+    yaml.load(input).asInstanceOf[Schema]
+  }
+
+  def LoadFromYaml(input : FSDataInputStream, spark : SparkSession): Schema = {
     val yaml = new Yaml(
       new Constructor(classOf[Schema], new LoaderOptions())
     )

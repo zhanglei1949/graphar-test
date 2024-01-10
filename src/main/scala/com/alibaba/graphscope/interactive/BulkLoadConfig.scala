@@ -1,6 +1,7 @@
 package com.alibaba.graphscope.interactive
 
-import org.apache.hadoop.fs.Path
+
+import org.apache.hadoop.fs.{FSDataInputStream, Path}
 import org.apache.spark.sql.SparkSession
 import org.yaml.snakeyaml.{LoaderOptions, Yaml}
 import org.yaml.snakeyaml.constructor.Constructor
@@ -83,6 +84,26 @@ class BulkLoadConfig() {
     })
     null
   }
+
+  def getEdgeSrcVertexMappings(labelName : String, srcLabel : String, dstLabel : String) : util.ArrayList[ColumnMapping] = {
+    edge_mappings.forEach(edge_mapping => {
+      val triplet = edge_mapping.type_triplet
+      if (triplet.edge.equals(labelName) && triplet.source_vertex.equals(srcLabel) && triplet.destination_vertex.equals(dstLabel)){
+        return edge_mapping.source_vertex_mappings
+      }
+    })
+    null
+  }
+
+  def getEdgeDstVertexMappings(labelName : String, srcLabel : String, dstLabel : String) : util.ArrayList[ColumnMapping] = {
+    edge_mappings.forEach(edge_mapping => {
+      val triplet = edge_mapping.type_triplet
+      if (triplet.edge.equals(labelName) && triplet.source_vertex.equals(srcLabel) && triplet.destination_vertex.equals(dstLabel)){
+        return edge_mapping.destination_vertex_mappings
+      }
+    })
+    null
+  }
 }
 
 object BulkLoadConfig {
@@ -90,6 +111,13 @@ object BulkLoadConfig {
     val path = new Path(yamlPath)
     val fs = path.getFileSystem(spark.sparkContext.hadoopConfiguration)
     val input = fs.open(path)
+    val yaml = new Yaml(
+      new Constructor(classOf[BulkLoadConfig], new LoaderOptions())
+    )
+    yaml.load(input).asInstanceOf[BulkLoadConfig]
+  }
+
+  def LoadFromYaml(input : FSDataInputStream, spark : SparkSession): BulkLoadConfig = {
     val yaml = new Yaml(
       new Constructor(classOf[BulkLoadConfig], new LoaderOptions())
     )

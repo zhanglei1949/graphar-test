@@ -11,7 +11,7 @@ object ReaderFactory {
     val scheme = loadingConfig.loading_config.data_source.scheme
     if (scheme.equals("odps") || scheme.equals("ODPS")) {
       LOG.info("Creating LoaderFactory for ODPS Table")
-      return new ODPSReaderFactory(loadingConfig);
+      return new ODPSReaderFactory(loadingConfig, schema);
     }
     else if (scheme.equals("file") || scheme.equals("FILE")) {
       LOG.info("Creating LoaderFactory from local file input")

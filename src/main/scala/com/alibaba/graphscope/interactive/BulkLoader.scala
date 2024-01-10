@@ -40,7 +40,7 @@ class BulkLoader(var sparkSession: SparkSession, var schema: Schema, var loading
         }
       }
 
-      LOG.info("Got final frame size {}, {}", cur_frame.count(),cur_frame.collect().mkString("Array(", ", ", ")"))
+//      LOG.info("Got final frame size {}, {}", cur_frame.count(),cur_frame.collect().mkString("Array(", ", ", ")"))
 
       //Now call PutVertexData.
       val primaryKeys = schema.getVertexPrimaryKey(cur_vertex_mapping.type_name);
@@ -50,7 +50,18 @@ class BulkLoader(var sparkSession: SparkSession, var schema: Schema, var loading
       if (primaryKeys.size() != 1) {
         throw new RuntimeException("Currently only support one primary key")
       }
-      graphWriter.PutVertexData(cur_vertex_mapping.type_name, cur_frame, primaryKeys.get(0))
+      //Here the primary is not the primary key in schema, but the the corresponding column name in the DataFrame
+      val schemaPrimaryKey = primaryKeys.get(0)
+      var corrColumnName : String = null
+      cur_vertex_mapping.column_mappings.forEach( mapping => {
+        if (mapping.property.equals(schemaPrimaryKey)){
+          corrColumnName = mapping.column.name
+        }
+      })
+      if (corrColumnName == null) {
+        throw new RuntimeException("Can not find primary key in column mapping")
+      }
+      graphWriter.PutVertexData(cur_vertex_mapping.type_name, cur_frame, corrColumnName)
       LOG.info("Finish putting vertex data for label {}, primary key {}", cur_vertex_mapping.type_name, primaryKeys.get(0): Any);
     }
   }
@@ -74,7 +85,7 @@ class BulkLoader(var sparkSession: SparkSession, var schema: Schema, var loading
           LOG.info("Union frame from {} to {}", prevCount, cur_frame.count())
         }
       }
-      LOG.info("Got final frame size {} {}", cur_frame.count(), cur_frame.collect().mkString("Array(", ", ", ")"))
+//      LOG.info("Got final frame size {} {}", cur_frame.count(), cur_frame.collect().mkString("Array(", ", ", ")"))
 
       val edgeTripletTuple = (cur_edge_mapping.type_triplet.source_vertex,
         cur_edge_mapping.type_triplet.edge,
