@@ -22,12 +22,12 @@ object YarnLoadGraph {
     val schema_input = fileSystem.open(schema_path)
     val schema = Schema.LoadFromYaml(schema_input, spark)
 
-    val config_path = new fs.Path("oss://zl-transfer/dd/import.yaml")
+    val config_path = new fs.Path("oss://zl-transfer/dd/full_import.yaml")
     val fileSystem2 = fs.FileSystem.get(config_path.toUri(), spark.sparkContext.hadoopConfiguration)
     val config_input = fileSystem2.open(config_path)
     val config = BulkLoadConfig.LoadFromYaml(config_input, spark)
 
     var loader = new BulkLoader(spark, schema, config)
-    assert(loader.loadGraph("oss://zl-transfer/dd/output2"))
+    assert(loader.loadGraph("oss://zl-transfer/dd/output3"))
   }
 }

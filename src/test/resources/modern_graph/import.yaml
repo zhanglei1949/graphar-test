@@ -59,11 +59,11 @@ edge_mappings:
     source_vertex_mappings:
       - column:
           index: 0
-          name: id
+          name: person.id
     destination_vertex_mappings:
       - column:
           index: 1
-          name: id
+          name: person.id2
     column_mappings:
       - column:
           index: 2
@@ -78,11 +78,11 @@ edge_mappings:
     source_vertex_mappings:
       - column:
           index: 0
-          name: id
+          name: person.id
     destination_vertex_mappings:
       - column:
           index: 1
-          name: id
+          name: software.id
     column_mappings:
       - column:
           index: 2
